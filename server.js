@@ -12,7 +12,18 @@ app.use('/articles', articleRouter);
 app.set('view engine', 'ejs')
 
 app.get('/', (req, res)=>{
-    res.render('index', { text: 'This is  bLOG!'});
+    const date = Date.now();
+    const subtitle = new Date(date).toLocaleDateString();
+    const articles = [{
+        title: 'test-article 1',
+        createdAt: subtitle,
+        description: 'test-description 1'
+    },{
+        title: 'test-article 2',
+        createdAt: subtitle,
+        description: 'test-description 1'
+    }]
+    res.render('articles/index', { articles: articles});
 });
 
 //server created
