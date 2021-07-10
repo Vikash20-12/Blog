@@ -3,6 +3,7 @@ const mongoose          = require('mongoose');
 const dotenv            = require('dotenv');
 const articleRouter     = require('./routes/articles');
 const Article           = require('./models/article');
+const methodOverride    = require('method-override');
 const app               = express();
 
 dotenv.config({path: 'config/config.env'})
@@ -24,12 +25,13 @@ const connectDB = async (req, res)=>{
 connectDB();
 
 app.use(express.urlencoded({extended: false}));
+app.use(methodOverride('_method'));
 
 
 app.set('view engine', 'ejs')
 
 app.get('/', async (req, res)=>{
-    const articles = await Article.find()
+    const articles = await Article.find().sort({ createdAt: 'desc'});
     res.render('articles/index', { articles: articles});
 });
 
