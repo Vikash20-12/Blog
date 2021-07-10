@@ -9,7 +9,7 @@ router.get('/new', (req, res)=>{
 
 //edit route
 router.get('/edit/:id', async(req, res)=>{
-    const article = await Article.findById(req.param.id);
+    const article = await Article.findById(req.params.id);
     res.render('articles/edit', {article: article});
 });
 
@@ -22,15 +22,20 @@ router.get('/:slug', async (req, res)=>{
     // res.send(req.params.id)
 });
 
+// to save new article data
 router.post('/', async (req, res, next)=>{
     req.article = new Article()
     next()
 }, saveArticleAndRedirect('new'));
 
-router.put('/:id',async(req, res)=>{
-    
-})
+//to save edited data
+router.put('/:id', async (req, res, next)=>{
+    req.article = await Article.findById(req.params.id)
+    next()
+}, saveArticleAndRedirect('edit'));
 
+
+//to delete data 
 router.delete('/:id', async(req, res)=>{
     await Article.findByIdAndDelete(req.params.id)
     res.redirect('/')
