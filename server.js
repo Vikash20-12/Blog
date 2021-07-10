@@ -1,30 +1,40 @@
 const express           = require('express');
-
+const mongoose          = require('mongoose');
+const dotenv            = require('dotenv');
 const articleRouter     = require('./routes/articles');
+const Article           = require('./models/article');
 const app               = express();
 
+dotenv.config({path: 'config/config.env'})
 
 
+const connectDB = async (req, res)=>{
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+        useNewUrlParser:true,
+        useUnifiedTopology:true,
+        useFindAndModify:false,
+        useCreateIndex:true
+    });
+    try {
+        console.log(`mongoDB connected to ${conn.connection.host}`);
+    } catch (error) {
+        return res.status(400).send(error);
+    }
+}
+connectDB();
 
-app.use('/articles', articleRouter);
+app.use(express.urlencoded({extended: false}));
 
 
 app.set('view engine', 'ejs')
 
-app.get('/', (req, res)=>{
-    const date = Date.now();
-    const subtitle = new Date(date).toLocaleDateString();
-    const articles = [{
-        title: 'test-article 1',
-        createdAt: subtitle,
-        description: 'test-description 1'
-    },{
-        title: 'test-article 2',
-        createdAt: subtitle,
-        description: 'test-description 1'
-    }]
+app.get('/', async (req, res)=>{
+    const articles = await Article.find()
     res.render('articles/index', { articles: articles});
 });
+
+//Routes Middleware
+app.use('/articles', articleRouter);
 
 //server created
 const PORT = process.env.PORT || 5000;
